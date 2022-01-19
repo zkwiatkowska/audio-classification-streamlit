@@ -21,7 +21,7 @@ class ESC50Reader(Dataset):
     def __getitem__(self, item):
         info = self.gt.iloc[item]
         audio, sr = sf.read(self.path / info["filename"])
-        target = torch.one_hot(torch.tensor(info['target']), num_classes=50)
+        target = torch.nn.functional.one_hot(torch.tensor(info['target']), num_classes=50)
         return audio, target, info["filename"]
 
 
