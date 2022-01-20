@@ -41,9 +41,7 @@ class ESC50OpenL3Reader(Dataset):
         info = self.gt.iloc[item]
         with open(self.path / f"{info['filename'].replace('.wav', '.npy')}", "rb") as f:
             emb, target = np.load(f, allow_pickle=True)
-        emb = emb.squeeze(axis=0)
-        emb = (emb - emb.min()) / (emb.max() - emb.min())
-        return emb, target
+        return emb.squeeze(axis=0), target
 
 
 def process_esc50_to_openl3(data_path: Path, embedding_size=512):

@@ -17,7 +17,7 @@ class OpenL3Classifier(LightningModule):
         self.net = nn.Sequential(
             nn.Linear(in_channels, 100),
             nn.BatchNorm1d(100),
-            nn.ReLU(),
+            nn.LeakyReLU(0.1),
             nn.Dropout(0.7),
             nn.Linear(100, out_channels),
         )
@@ -36,6 +36,7 @@ class OpenL3Classifier(LightningModule):
         self.save_hyperparameters()
 
     def forward(self, x):
+        x = (x - x.mean()) / x.std()
         x = self.net(x)
         x = nn.Softmax(dim=-1)(x)
         return x
@@ -79,13 +80,13 @@ if __name__ == '__main__':
     parser.add_argument("--embedding-size", default=512, type=int)
     parser.add_argument("--experiment-name", type=str, default="experiment")
     parser.add_argument("--test-fold", type=int, default=5)
-    parser.add_argument("--batch-size", type=int, default=1600)
+    parser.add_argument("--batch-size", type=int, default=400)
     args = parser.parse_args()
 
     embedding_path = Path(f"esc50_openl3_{args.embedding_size}")
+    embedding_path.mkdir(exist_ok=True)
 
-    if not embedding_path.exists():
-        embedding_path.mkdir()
+    if not any(embedding_path.iterdir()):
         process_esc50_to_openl3(args.esc50_path, args.embedding_size)
 
     train_reader = ESC50OpenL3Reader(args.esc50_path, embedding_path, train=True, test_fold=args.test_fold)
@@ -100,3 +101,13 @@ if __name__ == '__main__':
                       logger=loggers.TensorBoardLogger(save_dir='lightning_logs', name=args.experiment_name,
                                                        version=f"fold{args.test_fold}"))
     trainer.fit(model, train_loader, eval_loader)
+
+    model.eval()
+    acc = 0
+    for audio, target in eval_loader:
+        prediction = model(audio)
+        acc += sum(prediction.argmax(axis=1) == target.argmax(axis=1))
+    acc /= 400
+
+    with open(f"lightning_logs/{args.experiment_name}/fold{args.test_fold}/results.txt", "w") as f:
+        f.write(f"Accuracy: {acc}")

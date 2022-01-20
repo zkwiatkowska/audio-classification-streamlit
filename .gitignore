@@ -130,3 +130,5 @@ dmypy.json
 
 # project
 .idea
+lightning_logs/
+esc50_openl3_*
