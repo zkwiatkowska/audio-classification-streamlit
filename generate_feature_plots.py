@@ -44,11 +44,11 @@ if __name__ == '__main__':
     normed = {k: v / np.abs(v).max() for k, v in waves.items()}
 
     spectrogram_small_window = {k: make_spectrogram(v, n_fft=128, hop=32) for k, v in normed.items()}
-    spectrogram_wide_window = {k: make_spectrogram(v, n_fft=4096, hop=1028) for k, v in normed.items()}
-    log_spectrogram = {k: make_log_spectrogram(v, n_fft=4096, hop=1028) for k, v in normed.items()}
+    spectrogram_wide_window = {k: make_spectrogram(v, n_fft=4096, hop=1024) for k, v in normed.items()}
+    log_spectrogram = {k: make_log_spectrogram(v, n_fft=4096, hop=1024) for k, v in normed.items()}
 
-    mel_spectrogram = {k: make_mel_spectrogram(v, n_fft=4096, hop=1028, n_mels=128) for k, v in normed.items()}
-    log_mel_spectrogram = {k: make_logmel_spectrogram(v, n_fft=4096, hop=1028, n_mels=128) for k, v in normed.items()}
+    mel_spectrogram = {k: make_mel_spectrogram(v, n_fft=4096, hop=1024, n_mels=128) for k, v in normed.items()}
+    log_mel_spectrogram = {k: make_logmel_spectrogram(v, n_fft=4096, hop=1024, n_mels=128) for k, v in normed.items()}
 
     # PLOTS
 
