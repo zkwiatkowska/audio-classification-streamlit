@@ -77,8 +77,8 @@ if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument("--esc50-path", required=True, type=Path)
     parser.add_argument("--embedding-size", default=512, type=int)
-    parser.add_argument("--experiment-name", type=str)
-    parser.add_argument("--test-fold", type=int)
+    parser.add_argument("--experiment-name", type=str, default="experiment")
+    parser.add_argument("--test-fold", type=int, default=5)
     parser.add_argument("--batch-size", type=int, default=1600)
     args = parser.parse_args()
 
