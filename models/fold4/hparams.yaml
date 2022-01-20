@@ -1,0 +1,4 @@
+batch_size: 400
+in_channels: 512
+learning_rate: 0.001
+out_channels: 50

@@ -15,11 +15,11 @@ class OpenL3Classifier(LightningModule):
     def __init__(self, in_channels, out_channels, learning_rate, batch_size):
         super().__init__()
         self.net = nn.Sequential(
-            nn.Linear(in_channels, 100),
-            nn.BatchNorm1d(100),
+            nn.Linear(in_channels, 256),
+            nn.BatchNorm1d(256),
             nn.LeakyReLU(0.1),
-            nn.Dropout(0.7),
-            nn.Linear(100, out_channels),
+            nn.Dropout(0.5),
+            nn.Linear(256, out_channels),
         )
         self.learning_rate = learning_rate
 
@@ -97,17 +97,7 @@ if __name__ == '__main__':
     eval_loader = DataLoader(dataset=test_reader, num_workers=8, batch_size=args.batch_size, persistent_workers=True)
 
     model = OpenL3Classifier(args.embedding_size, 50, 1e-3, args.batch_size)
-    trainer = Trainer(max_epochs=500, gpus=1, check_val_every_n_epoch=1,
+    trainer = Trainer(max_epochs=150, gpus=1, check_val_every_n_epoch=1,
                       logger=loggers.TensorBoardLogger(save_dir='lightning_logs', name=args.experiment_name,
                                                        version=f"fold{args.test_fold}"))
     trainer.fit(model, train_loader, eval_loader)
-
-    model.eval()
-    acc = 0
-    for audio, target in eval_loader:
-        prediction = model(audio)
-        acc += sum(prediction.argmax(axis=1) == target.argmax(axis=1))
-    acc /= 400
-
-    with open(f"lightning_logs/{args.experiment_name}/fold{args.test_fold}/results.txt", "w") as f:
-        f.write(f"Accuracy: {acc}")
