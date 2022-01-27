@@ -44,6 +44,7 @@ def process_prediction(prediction, mapping, top_k=5):
     return prediction
 
 
+@st.cache()
 def setup_environment():
     loaded_model = OpenL3Classifier(512, 50, 1e-3, 1).load_from_checkpoint(
         "models/fold4/checkpoints/epoch=149-step=599.ckpt"
