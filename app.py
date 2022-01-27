@@ -7,6 +7,7 @@ from audio_features import make_spectrogram, make_log_spectrogram, make_logmel_s
 from train import OpenL3Classifier
 import pandas as pd
 import numpy as np
+import torch
 
 plt.style.use("ggplot")
 
@@ -23,8 +24,14 @@ def make_plot(feature, sr: int, name: str, y_axis: str):
     st.pyplot(fig=figs)
 
 
-def make_prediction(audio_file, sampling_rate, net):
-    feature, _ = torchopenl3.get_audio_embedding(audio_file, sampling_rate, content_type="env", embedding_size=512)
+def make_prediction(audio_file, sampling_rate, net, feature_net):
+    feature, _ = torchopenl3.get_audio_embedding(
+        audio_file,
+        sampling_rate,
+        model=feature_net,
+        content_type="env",
+        embedding_size=512
+    )
     feature = feature.mean(axis=1).cpu()
     return net(feature).detach().numpy()
 
@@ -39,18 +46,22 @@ def process_prediction(prediction, mapping, top_k=5):
 
 def setup_environment():
     loaded_model = OpenL3Classifier(512, 50, 1e-3, 1).load_from_checkpoint(
-        "models/fold4/checkpoints/epoch=149-step=599.ckpt",
-        map_location={"cuda:0": "cpu"}
+        "models/fold4/checkpoints/epoch=149-step=599.ckpt"
     )
     loaded_model.eval()
 
+    openl3model = torchopenl3.models.PytorchOpenl3(input_repr="mel256", embedding_size=512, content_type="env")
+    openl3_state_dict = torch.load("models/openl3_mel256_env_512.pth.tar")
+    openl3model.load_state_dict(openl3_state_dict)
+    openl3model.eval()
+
     classes = pd.read_csv("class_map.csv")
-    return loaded_model, classes
+    return loaded_model, openl3model, classes
 
 
 if __name__ == '__main__':
 
-    model, class_map = setup_environment()
+    model, feature_model, class_map = setup_environment()
 
     st.header("Upload .wav audio file")
     uploaded_file = st.file_uploader("", type="wav")
@@ -113,7 +124,7 @@ if __name__ == '__main__':
                 )
 
             st.header("Classification")
-            answer = make_prediction(audio, sample_rate, model)
+            answer = make_prediction(audio, sample_rate, model, feature_model)
             top_k_predictions = pd.DataFrame(
                 process_prediction(answer, class_map, top_k=top_k_classes),
                 columns=["Class", "Probability"]
