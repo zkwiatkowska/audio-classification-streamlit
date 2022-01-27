@@ -37,20 +37,20 @@ def get_audio_embedding(
     audio = torchopenl3.core.preprocess_audio_batch(audio, sr, center, hop_size, sampler=sampler).to(
         torch.float32
     )
-    # total_size = audio.size()[0]
-    # audio_embedding = []
-    # with torch.set_grad_enabled(False):
-    #     for i in range((total_size // batch_size) + 1):
-    #         small_batch = audio[i * batch_size : (i + 1) * batch_size]
-    #         if small_batch.shape[0] > 0:
-    #             # print("small_batch.shape", small_batch.shape)
-    #             audio_embedding.append(model(small_batch))
-    # audio_embedding = torch.vstack(audio_embedding)
-    # # This is broken, doesn't use hop-size or center
-    # ts_list = torch.arange(audio_embedding.size()[0] // nsounds) * hop_size
-    # ts_list = ts_list.expand(nsounds, audio_embedding.size()[0] // nsounds)
-    #
-    # return (
-    #     audio_embedding.view(nsounds, audio_embedding.shape[0] // nsounds, -1),
-    #     ts_list,
-    # )
+    total_size = audio.size()[0]
+    audio_embedding = []
+    with torch.set_grad_enabled(False):
+        for i in range((total_size // batch_size) + 1):
+            small_batch = audio[i * batch_size : (i + 1) * batch_size]
+            if small_batch.shape[0] > 0:
+                # print("small_batch.shape", small_batch.shape)
+                audio_embedding.append(model(small_batch))
+    audio_embedding = torch.vstack(audio_embedding)
+    # This is broken, doesn't use hop-size or center
+    ts_list = torch.arange(audio_embedding.size()[0] // nsounds) * hop_size
+    ts_list = ts_list.expand(nsounds, audio_embedding.size()[0] // nsounds)
+
+    return (
+        audio_embedding.view(nsounds, audio_embedding.shape[0] // nsounds, -1),
+        ts_list,
+    )

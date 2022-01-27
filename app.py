@@ -27,8 +27,7 @@ def make_plot(feature, sr: int, name: str, y_axis: str):
 
 @st.cache()
 def make_prediction(audio_file, sampling_rate, net, feature_net):
-    # feature, _ = get_audio_embedding(
-    get_audio_embedding(
+    feature, _ = get_audio_embedding(
         audio_file,
         sampling_rate,
         model=feature_net,
