@@ -8,6 +8,7 @@ from train import OpenL3Classifier
 import pandas as pd
 import numpy as np
 import torch
+from cpu_openl3 import get_audio_embedding
 
 plt.style.use("ggplot")
 
@@ -26,7 +27,7 @@ def make_plot(feature, sr: int, name: str, y_axis: str):
 
 @st.cache()
 def make_prediction(audio_file, sampling_rate, net, feature_net):
-    feature, _ = torchopenl3.get_audio_embedding(
+    feature, _ = get_audio_embedding(
         audio_file,
         sampling_rate,
         model=feature_net,
@@ -128,11 +129,11 @@ if __name__ == '__main__':
 
             st.header("Classification")
             answer = make_prediction(audio, sample_rate, model, feature_model)
-            # top_k_predictions = pd.DataFrame(
-            #     process_prediction(answer, class_map, top_k=top_k_classes),
-            #     columns=["Class", "Probability"]
-            # )
-            #
-            # fig = plt.figure(figsize=(10, 5))
-            # plt.barh(top_k_predictions["Class"], top_k_predictions["Probability"])
-            # st.pyplot(fig=fig)
+            top_k_predictions = pd.DataFrame(
+                process_prediction(answer, class_map, top_k=top_k_classes),
+                columns=["Class", "Probability"]
+            )
+
+            fig = plt.figure(figsize=(10, 5))
+            plt.barh(top_k_predictions["Class"], top_k_predictions["Probability"])
+            st.pyplot(fig=fig)
