@@ -24,6 +24,7 @@ def make_plot(feature, sr: int, name: str, y_axis: str):
     st.pyplot(fig=figs)
 
 
+@st.cache()
 def make_prediction(audio_file, sampling_rate, net, feature_net):
     feature, _ = torchopenl3.get_audio_embedding(
         audio_file,
@@ -125,8 +126,8 @@ if __name__ == '__main__':
                     y_axis="mel"
                 )
 
-            # st.header("Classification")
-            # answer = make_prediction(audio, sample_rate, model, feature_model)
+            st.header("Classification")
+            answer = make_prediction(audio, sample_rate, model, feature_model)
             # top_k_predictions = pd.DataFrame(
             #     process_prediction(answer, class_map, top_k=top_k_classes),
             #     columns=["Class", "Probability"]
