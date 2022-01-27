@@ -34,9 +34,9 @@ def get_audio_embedding(
     assert audio.ndim == 2 or audio.ndim == 3
     nsounds = audio.shape[0]
 
-    # audio = torchopenl3.core.preprocess_audio_batch(audio, sr, center, hop_size, sampler=sampler).to(
-    #     torch.float32
-    # )
+    audio = torchopenl3.core.preprocess_audio_batch(audio, sr, center, hop_size, sampler=sampler).to(
+        torch.float32
+    )
     # total_size = audio.size()[0]
     # audio_embedding = []
     # with torch.set_grad_enabled(False):
