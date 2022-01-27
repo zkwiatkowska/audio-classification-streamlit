@@ -27,15 +27,16 @@ def make_plot(feature, sr: int, name: str, y_axis: str):
 
 @st.cache()
 def make_prediction(audio_file, sampling_rate, net, feature_net):
-    feature, _ = get_audio_embedding(
+    # feature, _ = get_audio_embedding(
+    get_audio_embedding(
         audio_file,
         sampling_rate,
         model=feature_net,
         content_type="env",
         embedding_size=512
     )
-    feature = feature.mean(axis=1)
-    return net(feature).detach().numpy()
+    # feature = feature.mean(axis=1)
+    # return net(feature).detach().numpy()
 
 
 def process_prediction(prediction, mapping, top_k=5):
@@ -128,12 +129,13 @@ if __name__ == '__main__':
                 )
 
             st.header("Classification")
-            answer = make_prediction(audio, sample_rate, model, feature_model)
-            top_k_predictions = pd.DataFrame(
-                process_prediction(answer, class_map, top_k=top_k_classes),
-                columns=["Class", "Probability"]
-            )
-
-            fig = plt.figure(figsize=(10, 5))
-            plt.barh(top_k_predictions["Class"], top_k_predictions["Probability"])
-            st.pyplot(fig=fig)
+            make_prediction(audio, sample_rate, model, feature_model)
+            # answer = make_prediction(audio, sample_rate, model, feature_model)
+            # top_k_predictions = pd.DataFrame(
+            #     process_prediction(answer, class_map, top_k=top_k_classes),
+            #     columns=["Class", "Probability"]
+            # )
+            #
+            # fig = plt.figure(figsize=(10, 5))
+            # plt.barh(top_k_predictions["Class"], top_k_predictions["Probability"])
+            # st.pyplot(fig=fig)
