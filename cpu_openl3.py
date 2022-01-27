@@ -9,18 +9,13 @@ import torchopenl3
 def get_audio_embedding(
     audio,
     sr,
-    model=None,
-    input_repr="mel256",
-    content_type="music",
+    model,
     embedding_size=6144,
     center=True,
     hop_size=0.1,
-    batch_size=32,
+    batch_size=16,
     sampler="resampy",
 ):
-
-    if model is None:
-        model = torchopenl3.core.load_audio_embedding_model(input_repr, content_type, embedding_size)
 
     device = "cpu"
 
@@ -47,5 +42,7 @@ def get_audio_embedding(
                 y = model(small_batch)
                 ctr += y.shape[0]
                 audio_embedding += y.sum(axis=0)
+
+    audio_embedding /= ctr
 
     return audio_embedding

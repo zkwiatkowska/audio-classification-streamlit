@@ -30,8 +30,7 @@ def make_prediction(audio_file, sampling_rate, net, feature_net):
     feature = get_audio_embedding(
         audio_file,
         sampling_rate,
-        model=feature_net,
-        content_type="env",
+        feature_net,
         embedding_size=512
     )
     # return net(feature).detach().numpy()
