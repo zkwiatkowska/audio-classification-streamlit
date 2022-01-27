@@ -27,14 +27,13 @@ def make_plot(feature, sr: int, name: str, y_axis: str):
 
 @st.cache()
 def make_prediction(audio_file, sampling_rate, net, feature_net):
-    feature, _ = get_audio_embedding(
+    feature = get_audio_embedding(
         audio_file,
         sampling_rate,
         model=feature_net,
         content_type="env",
         embedding_size=512
     )
-    # feature = feature.mean(axis=1)
     # return net(feature).detach().numpy()
 
 
