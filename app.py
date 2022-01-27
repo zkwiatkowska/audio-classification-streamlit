@@ -125,13 +125,13 @@ if __name__ == '__main__':
                     y_axis="mel"
                 )
 
-            st.header("Classification")
-            answer = make_prediction(audio, sample_rate, model, feature_model)
-            top_k_predictions = pd.DataFrame(
-                process_prediction(answer, class_map, top_k=top_k_classes),
-                columns=["Class", "Probability"]
-            )
-
-            fig = plt.figure(figsize=(10, 5))
-            plt.barh(top_k_predictions["Class"], top_k_predictions["Probability"])
-            st.pyplot(fig=fig)
+            # st.header("Classification")
+            # answer = make_prediction(audio, sample_rate, model, feature_model)
+            # top_k_predictions = pd.DataFrame(
+            #     process_prediction(answer, class_map, top_k=top_k_classes),
+            #     columns=["Class", "Probability"]
+            # )
+            #
+            # fig = plt.figure(figsize=(10, 5))
+            # plt.barh(top_k_predictions["Class"], top_k_predictions["Probability"])
+            # st.pyplot(fig=fig)
