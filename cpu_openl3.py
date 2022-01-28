@@ -12,7 +12,7 @@ def get_audio_embedding(
     model,
     embedding_size=6144,
     center=True,
-    hop_size=0.1,
+    hop_size=0.5,
     batch_size=16,
     sampler="resampy",
 ):
@@ -31,17 +31,15 @@ def get_audio_embedding(
     audio = torchopenl3.core.preprocess_audio_batch(audio, sr, center, hop_size, sampler=sampler).to(
         torch.float32
     )
+
     total_size = audio.size()[0]
     audio_embedding = torch.zeros(size=(1, embedding_size))
     ctr = 0
 
-    with torch.set_grad_enabled(False):
-        for i in range((total_size // batch_size) + 1):
-            small_batch = audio[i * batch_size : (i + 1) * batch_size]
-            if small_batch.shape[0] > 0:
-                y = model(small_batch)
-                ctr += y.shape[0]
-                audio_embedding += y.sum(axis=0)
+    for i in range(total_size):
+        y = model(audio[i:i+1, :, :])
+        ctr += y.shape[0]
+        audio_embedding += y.sum(axis=0)
 
     audio_embedding /= ctr
 
