@@ -8,7 +8,7 @@ from train import OpenL3Classifier
 import pandas as pd
 import numpy as np
 import torch
-from cpu_openl3 import get_audio_embedding
+from cpu_openl3 import get_simplified_audio_embedding
 
 plt.style.use("ggplot")
 
@@ -27,11 +27,15 @@ def make_plot(feature, sr: int, name: str, y_axis: str):
 
 @st.cache()
 def make_prediction(audio_file, sampling_rate, net, feature_net):
-    feature = get_audio_embedding(
+    # feature = get_simplified_audio_embedding(
+    feature, _ = torchopenl3.get_audio_embedding(
         audio_file,
         sampling_rate,
-        feature_net,
-        embedding_size=512
+        model=feature_net,
+        embedding_size=512,
+        content_type="env",
+        hop_size=0.5,
+        batch_size=1
     )
     # return net(feature).detach().numpy()
 
