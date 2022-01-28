@@ -76,12 +76,9 @@ if __name__ == '__main__':
     top_k_classes = st.sidebar.slider("Choose number of top K classes", min_value=1, max_value=50, value=5)
 
     if uploaded_file is not None:
-        if uploaded_file.type not in ["audio/wav", "audio/x-wav"]:
-            st.warning("Wrong file type")
+        if uploaded_file.type != "audio/wav":
+            st.warning(f"Wrong file type: {uploaded_file.type}")
         else:
-            if uploaded_file.type is "audio/x-wav":
-                uploaded_file.type = "audio/wav"
-
             audio, sample_rate = sf.read(uploaded_file)
 
             st.header("Listen to your audio file")
