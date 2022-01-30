@@ -9,10 +9,10 @@ from audio_features import make_spectrogram, make_log_spectrogram, make_mel_spec
 from data_processors import ESC50Reader
 
 EXAMPLES = {
-    "Dog": 0,
-    "Birds": 1,
-    "Vacuum Cleaner": 2,
-    "Laughter": 69
+    "Dog": 496,
+    "Vacuum Cleaner": 1061,
+    "Siren": 641,
+    "Church Bells": 1841
 }
 SR = 44100
 
