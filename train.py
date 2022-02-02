@@ -4,7 +4,8 @@ from torch import nn
 from torch.utils.data import DataLoader
 from torch.nn.functional import cross_entropy
 import torch
-from torchmetrics import MetricCollection, Accuracy, Precision, Recall, F1
+from torchmetrics import MetricCollection, Accuracy
+from torchsummary import summary
 from argparse import ArgumentParser
 
 from data_processors import process_esc50_to_openl3, ESC50OpenL3Reader
@@ -24,10 +25,7 @@ class OpenL3Classifier(LightningModule):
         self.learning_rate = learning_rate
 
         metrics = MetricCollection([
-            Accuracy(average="micro", num_classes=out_channels),
-            Precision(average="micro", num_classes=out_channels),
-            Recall(average="micro", num_classes=out_channels),
-            F1(average="micro", num_classes=out_channels)
+            Accuracy(num_classes=out_channels)
         ])
         self.training_metrics = metrics.clone(postfix="/Train")
         self.validation_metrics = metrics.clone(postfix="/Test")
@@ -62,14 +60,14 @@ class OpenL3Classifier(LightningModule):
 
     def validation_epoch_end(self, outputs):
         mean_scores = self.validation_metrics.compute()
-        mean_scores = {f"{key}/Epoch": value for key, value in mean_scores.items()}
         mean_scores['step'] = self.current_epoch
+        mean_scores['Loss/Test'] = outputs[0]
         self.log_dict(mean_scores, on_step=False, on_epoch=True, batch_size=self.batch_size)
 
     def training_epoch_end(self, outputs):
         mean_scores = self.training_metrics.compute()
-        mean_scores = {f"{key}/Epoch": value for key, value in mean_scores.items()}
         mean_scores['step'] = self.current_epoch
+        mean_scores['Loss/Train'] = torch.stack([i["loss"] for i in outputs]).mean()
         self.log_dict(mean_scores, on_step=False, on_epoch=True, batch_size=self.batch_size)
 
 
@@ -97,6 +95,8 @@ if __name__ == '__main__':
     eval_loader = DataLoader(dataset=test_reader, num_workers=8, batch_size=args.batch_size, persistent_workers=True)
 
     model = OpenL3Classifier(args.embedding_size, 50, 1e-3, args.batch_size)
+    summary(model)
+
     trainer = Trainer(max_epochs=150, gpus=1, check_val_every_n_epoch=1,
                       logger=loggers.TensorBoardLogger(save_dir='lightning_logs', name=args.experiment_name,
                                                        version=f"fold{args.test_fold}"))
